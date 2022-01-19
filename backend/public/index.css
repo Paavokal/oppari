@@ -1,0 +1,124 @@
+html {
+    box-sizing: border-box;
+  }
+  
+  *,
+  *:before,
+  *:after {
+    box-sizing: inherit;
+  }
+
+#app,
+html,
+body {
+  height: 100vh;
+  max-height: 100vh;
+  margin: 0;
+}
+
+#app{
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 50px auto 50px;
+    overflow: hidden;
+    min-height: 100vh;
+    /* Changes in media query to double this */
+    max-height: 100vh;
+}
+
+#chat-main{
+    flex-grow: 1;
+    /* can grow as big as needed */
+    overflow: hidden;
+}
+
+#header {
+    background: linear-gradient(334deg, #939795, #a2b9ac);
+    grid-column: 1 / span 1;
+    grid-row: 1 / 1;
+    display:flex;
+    justify-content: center;
+    align-items: center;
+}
+#footer {
+    background-color: #79978b;
+    grid-column: 1 / span 1;
+    grid-row: 3 / 3;
+}
+#chat{
+    height: 100%;
+    grid-column: 1 / span 1;
+    grid-row: 2 / 2;
+    display: grid;
+    grid-template-columns: 6fr 1fr;
+    grid-template-rows: 1fr;
+}
+#messageWindow{
+    background-color: #a2b9ac;
+    grid-column-start: 1;
+    grid-column-end: 1;
+    grid-row-start: 1;
+    grid-row-end: 1;
+    overflow: auto;
+    height: 100%;
+}
+
+#userWindow{
+    background-color: #939795;
+    grid-column-start: 2;
+    grid-column-end: 2;
+    grid-row-start: 1;
+    grid-row-end: 1;
+    overflow: auto;
+    border: inset;
+    border-color: cadetblue;
+    min-width: fit-content;
+}
+
+
+
+#loginWindow{
+    display:flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    height: 100%;
+    align-items: center;
+}
+
+#users {
+    list-style-type: none;
+    margin:0;
+    padding: 10px;
+}
+
+#messages {
+    list-style-type: none;
+    margin:0;
+    padding:20px;
+}
+
+#messages > li { 
+    border: groove;
+    padding: 15px;
+    border-radius: 14px;
+    width: fit-content;
+    margin-bottom: 12px;
+}
+
+
+#form { z-index: 1; background: rgba(0, 0, 0, 0.15); padding: 0.25rem; position: fixed; bottom: 0; left: 0; right: 0; display: flex; height: 3rem; box-sizing: border-box; backdrop-filter: blur(10px); }
+#input { border: none; padding: 0 1rem; flex-grow: 1; border-radius: 2rem; margin: 0.25rem; }
+#input:focus { outline: none; }
+#form > button { background: #333; border: none; padding: 0 1rem; margin: 0.25rem; border-radius: 3px; outline: none; color: #fff; }
+
+#form,
+#chat {
+    display:none;
+}
+
+#site-title {
+    color: #e1dcdc;
+    font-size: 26px;
+    font-family: monospace;
+    letter-spacing: 10px;
+}

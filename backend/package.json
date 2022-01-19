@@ -4,7 +4,9 @@
   "description": "chat-app server",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "server": "node index.js",
+    "dev": "nodemon index.js"
   },
   "repository": {
     "type": "git",
@@ -18,8 +20,11 @@
   ],
   "author": "Paavo Kalliala",
   "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/Paavokal/oppari/issues"
+  "dependencies": {
+    "express": "^4.17.2",
+    "socket.io": "^4.4.1"
   },
-  "homepage": "https://github.com/Paavokal/oppari#readme"
+  "devDependencies": {
+    "nodemon": "^2.0.15"
+  }
 }

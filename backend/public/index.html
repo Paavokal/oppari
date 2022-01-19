@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Chatti</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="index.css">
+  </head>
+  <body>
+      <div id="app">
+    
+        <div id="header">
+            <div id="site-title"> Chatti </div>
+        </div>
+
+        <div id="chat-main">
+            <!--LOGIN window-->
+            <div id="loginWindow">
+                <p>Enter your nickname</p>
+                <p id="nickError"></p>
+                <form id="setNickname">
+                  <input size="35" id="nickname"> </input>
+                  <button>Send</button>
+                </form>
+            </div>
+            <!--CHAT window-->
+            <div id="chat">
+                <div id="messageWindow">
+                            <ul id="messages"></ul>             
+                </div>
+                <div id="userWindow">
+                    <div>Users:</div>
+                    <ul id="users"></ul>
+                </div>
+            </div>
+
+        </div>
+
+        <div id="footer">
+            <form id="form" action="">
+                <input id="input" autocomplete="off" /><button>Send</button>
+            </form>
+        </div>
+      </div>
+
+      <script src="/socket.io/socket.io.js"></script>
+
+      <script>
+
+          const socket = io({autoConnect:false})
+
+          const form = document.getElementById('form')
+          const input = document.getElementById('input')
+          const chat = document.getElementById('chat')
+          const setNickname = document.getElementById('setNickname')
+          const loginWindow = document.getElementById('loginWindow')
+          const nickInput = document.getElementById('nickname')
+          const messageWindow = document.getElementById('messageWindow')
+          const userList = document.getElementById('users')
+          const nickname = ''
+
+          // SET NICKNAME EVENTHANDLER
+          setNickname.addEventListener('submit', (e) => {
+                e.preventDefault()
+                if(nickInput.value){
+                    socket.connect()
+                    socket.emit('user_join', nickInput.value)
+                    chat.style.display = 'grid'
+                    form.style.display = 'flex'
+                    loginWindow.style.display = 'none'
+                    document.title = `Chatti - ${nickInput.value}`
+              }
+          })
+          //CHAT-MESSAGE EVENTHANDLER
+          form.addEventListener('submit', (e) =>{
+            e.preventDefault()
+            if (input.value) {
+                socket.emit('chat message', input.value)
+                input.value = ''
+            }
+      })
+        
+          //USER JOIN
+          socket.on('user_join', (users) => {
+                userList.innerHTML= ''
+                users.forEach(element => {
+                    const item = document.createElement('li')
+                    item.innerHTML = element
+                    userList.appendChild(item)
+                });
+
+          })
+
+          //CHAT MESSAGE
+          socket.on('chat message', (msg) => {
+            var item = document.createElement('li')
+            item.innerHTML = msg
+            messages.appendChild(item)
+            messageWindow.scrollTo(0, messageWindow.scrollHeight)
+          })
+
+          //USER DISCONNECT
+          socket.on('user_quit', (users) => {
+            userList.innerHTML=''
+            users.forEach(element => {
+                var item = document.createElement('li')
+                item.innerHTML = element
+                userList.appendChild(item)         
+            })
+          })
+
+
+
+      </script>
+  </body>
+</html>
