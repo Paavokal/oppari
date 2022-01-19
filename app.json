@@ -1,0 +1,21 @@
+{
+    "name": "Chatti",
+    "description": "chatti",
+    "website": "https://github.com/Paavokal/oppari/backend",
+    "repository": "https://github.com/Paavokal/oppari/backend",
+    "success_url": "/",
+    "keywords": [
+      "node",
+      "express",
+      "socket.io",
+      "realtime",
+      "websocket"
+    ],
+    "scripts": {
+    },
+    "addons": [
+    ],
+    "env": {
+      "BUILDPACK_URL": "https://github.com/heroku/heroku-buildpack-nodejs"
+    }
+  }
