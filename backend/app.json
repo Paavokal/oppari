@@ -1,8 +1,8 @@
 {
     "name": "Chatti",
     "description": "chatti",
-    "website": "https://github.com/Paavokal/oppari",
-    "repository": "https://github.com/Paavokal/oppari",
+    "website": "https://github.com/Paavokal/oppari/backend",
+    "repository": "https://github.com/Paavokal/oppari/backend",
     "success_url": "/",
     "keywords": [
       "node",
