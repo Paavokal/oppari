@@ -24,7 +24,6 @@ io.on('connection',(socket)=>{
     //USER JOIN
     socket.on('user_join', (data) => {
         socket.nickname = data
-
         users.push(data)
         io.emit('user_join', users)
         socket.broadcast.emit('chat message', `<b> ${socket.nickname} connected </b>`)
@@ -45,7 +44,6 @@ io.on('connection',(socket)=>{
           }
     })
 })
-
 
 
 server.listen(PORT, () => {
