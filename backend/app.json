@@ -3,7 +3,7 @@
     "description": "chatti",
     "website": "https://github.com/Paavokal/oppari/",
     "repository": "https://github.com/Paavokal/oppari/",
-    "success_url": "/index.js",
+    "success_url": "/",
     "keywords": [
       "node",
       "express",

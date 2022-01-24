@@ -4,6 +4,7 @@ const http = require('http')
 const server = http.createServer(app)
 const PORT = process.env.PORT || 3001
 const socketIo = require('socket.io')
+const socketioJwt = require('socketio-jwt')
 
 const io = socketIo(server,{ 
     cors: {
@@ -21,30 +22,51 @@ const date = `Server startup: ${new Date()}`
 const users = []
 
 
+// MIDDLEWARE: USERNAME HANDSHAKE TO SOCKET
+io.use((socket, next) => {
+    console.log(socket.handshake.auth.username)
+    const username = socket.handshake.auth.username
+    if (!username) {
+        return next(new Error("invalid username"))
+    }
+    socket.username = username
+    next()
+})
+
+
 //CLIENT CONNECTION
 io.on('connection',(socket)=>{
-    console.log('client connected: ',socket.id)
+
+    console.log(socket)
+    socket.onAny((event, ...args) => {
+        console.log(event, args)
+    })
 
     //USER JOIN
-    socket.on('user_join', (data) => {
-        socket.nickname = data
-        users.push(data)
+    socket.on('user_join', () => {
+        users.push(socket.username)
         io.emit('user_join', users)
-        socket.broadcast.emit('chat message', `<b> ${socket.nickname} connected </b>`)
+        socket.broadcast.emit('chat message', `<b> ${socket.username} connected </b>`)
+        console.log(users)
     })
 
     //CHAT-MESSAGE
     socket.on('chat message', msg => {
-        io.emit('chat message',`<b>${socket.nickname}</b>: ${msg}`)
-      })
+        io.emit('chat message',`<b>${socket.username}</b>: ${msg}`)
+    })
+
+    //PRIVATE MESSAGE
+    socket.on('private_message', (toUser, msgToUser) => {
+        console.log(io.allSockets())
+    })
     
     //USER DISCONNECT
     socket.on('disconnect', () => {
-        if (socket.nickname) {
-            users.splice(users.indexOf(socket.nickname), 1)
+        if (socket.username) {
+            users.splice(users.indexOf(socket.username), 1)
             console.log(users)
             io.emit('user_quit', users)
-            socket.broadcast.emit('chat message', `<b> ${socket.nickname} disconnected </b>`)
+            socket.broadcast.emit('chat message', `<b> ${socket.username} disconnected </b>`)
           }
     })
 })

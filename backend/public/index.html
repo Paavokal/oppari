@@ -45,7 +45,7 @@
       <script src="/socket.io/socket.io.js"></script>
 
       <script>
-
+        
           const socket = io({autoConnect:false})
 
           const form = document.getElementById('form')
@@ -56,24 +56,40 @@
           const nickInput = document.getElementById('nickname')
           const messageWindow = document.getElementById('messageWindow')
           const userList = document.getElementById('users')
+
           const nickname = ''
+          
 
           // SET NICKNAME EVENTHANDLER
           setNickname.addEventListener('submit', (e) => {
                 e.preventDefault()
+
                 if(nickInput.value){
+                    socket.auth = { username:nickInput.value }
                     socket.connect()
-                    socket.emit('user_join', nickInput.value)
+                    socket.emit('user_join', null)
                     chat.style.display = 'grid'
                     form.style.display = 'flex'
                     loginWindow.style.display = 'none'
                     document.title = `Chatti - ${nickInput.value}`
               }
           })
+
           //CHAT-MESSAGE EVENTHANDLER
           form.addEventListener('submit', (e) =>{
             e.preventDefault()
-            if (input.value) {
+
+            if(input.value.startsWith('/w')){
+                const words = input.value.split(' ')
+                const toUser = words[1]
+                const msgToUser = input.value.substr(input.value.indexOf(' ', input.value.indexOf(' ') + 1) + 1)
+
+                console.log(toUser + ' -> ' +msgToUser)
+                socket.emit('private_message', toUser, msgToUser)
+                input.value = ''
+            }
+
+            else if(input.value) {
                 socket.emit('chat message', input.value)
                 input.value = ''
             }
@@ -87,6 +103,7 @@
                     item.innerHTML = element
                     userList.appendChild(item)
                 });
+                console.log(socket)
 
           })
 
@@ -106,6 +123,12 @@
                 item.innerHTML = element
                 userList.appendChild(item)         
             })
+          })
+
+          socket.on("connect_error", (err) => {
+            if (err.message === "invalid username") {
+                console.log('Invalid username')
+            }
           })
 
 
