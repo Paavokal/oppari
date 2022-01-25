@@ -24,6 +24,13 @@
             </div>
             <!--CHAT window-->
             <div id="chat">
+                <div id="privateWindow">
+                    <div id="privateHeader">
+                        <div id="privateTitle"></div>
+                        <button id="privateExit">X</button>
+                    </div>
+                    <ul id="privateMessages"></ul>
+                </div>
                 <div id="messageWindow">
                             <ul id="messages"></ul>             
                 </div>
@@ -38,6 +45,9 @@
         <div id="footer">
             <form id="form" action="">
                 <input id="input" autocomplete="off" /><button>Send</button>
+            </form>
+            <form id="privateForm" action="">
+                <input id="privateInput" autocomplete="off" /><button>Send</button>
             </form>
         </div>
       </div>
@@ -64,10 +74,17 @@
           const nickInput = document.getElementById('nickname')
           const messageWindow = document.getElementById('messageWindow')
           const userList = document.getElementById('users')
-
+          const privateWindow = document.getElementById('privateWindow')
+          const privateHeader = document.getElementById('privateHeader')
+          const privateTitle = document.getElementById('privateTitle')
+          const privateForm = document.getElementById('privateForm')
+          const privateExit = document.getElementById('privateExit')
           const nickname = ''
+          var toUser = ''
 
-          socket.on("session", ({ sessionID, userID }) => {
+
+          //SESSION ON
+          socket.on("session", ({ sessionID, userID, username }) => {
             // attach the session ID to the next reconnection attempts
             socket.auth = { sessionID }
             // store it in the localStorage
@@ -77,6 +94,7 @@
             chat.style.display = 'grid'
             form.style.display = 'flex'
             loginWindow.style.display = 'none'
+            document.title = `Chatti - ${username}`
           })
 
           
@@ -88,15 +106,7 @@
                 if(nickInput.value){
                     socket.auth = { username:nickInput.value }
                     socket.connect()
-                    chat.style.display = 'grid'
-                    form.style.display = 'flex'
-                    loginWindow.style.display = 'none'
-                    document.title = `Chatti - ${nickInput.value}`
               }
-          })
-
-          socket.on('connected', (user, token) => {
-                socket.emit('user_join', null)
           })
 
           //CHAT-MESSAGE EVENTHANDLER
@@ -119,13 +129,34 @@
             }
           })
 
+          
+          privateForm.addEventListener('submit', (e) =>{
+            e.preventDefault()
+            const msg = privateInput.value
+            socket.emit('private_message', toUser, msg)
+            privateInput.value = ''
+          })
 
+          //CLOSE PRIVATE WINDOW
+          privateExit.addEventListener('click', (e) =>{
+            e.preventDefault()
+            privateWindow.style.display = 'none'
+            messageWindow.style.display = 'block'
+            privateForm.style.display = 'none'
+            form.style.display = 'flex'
 
+          })
 
-          const privateMessage = (element) => {
-               console.log(element.username + ' ' + element.userID )
+        //OPEN PRIVATE WINDOW
+        const privateMessage = (element) => {
+            privateWindow.style.display = 'block'
+            privateTitle.innerHTML = element.username
+            messageWindow.style.display = 'none'
+            privateForm.style.display = 'flex'
+            form.style.display = 'none'
+            toUser = element.userID
+            console.log(element.username + ' ' + element.userID )     
           }
-
 
           //USER JOIN
           socket.on('users', (users) => {
@@ -149,6 +180,26 @@
             messageWindow.scrollTo(0, messageWindow.scrollHeight)
           })
 
+          //PRIVATE MESSAGE
+          socket.on('private_message', (data) => {
+            console.log(data.from +' private message tulee: ' + data.msg)
+            
+            for (let i = 0; i < this.users.length; i++) {
+                const user = this.users[i];
+                if (user.userID === data.from) {
+                    user.messages.push(data.msg)
+                    console.log(user.messages)
+                }
+                break;
+            }
+        
+            console.log('private message tulee')
+            var item = document.createElement('li')
+            item.innerHTML = data.msg
+            privateMessages.appendChild(item)
+            privateWindow.scrollTo(0, privateWindow.scrollHeight)
+          })
+
           //USER DISCONNECT
           socket.on('user_quit', (users) => {
             const usersConnected = users.map(u => u)
@@ -160,14 +211,19 @@
             })
           })
 
+          //CONNECT ERRORS
           socket.on("connect_error", (err) => {
             if (err.message === "invalid username") {
                 console.log('Invalid username')
             }
-            if (err.message === "invalid token") {
-                console.log('invalid token')
-            }
 
+            if (err.message === "username already taken") {
+                chat.style.display = 'none'
+                form.style.display = 'none'
+                loginWindow.style.display = 'flex'
+                alert('username already taken')
+                console.log('username already taken')
+            }
           })
 
 

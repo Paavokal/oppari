@@ -23,11 +23,12 @@ app.use(express.static(__dirname + '/public'))
 
 app.get('/', (req, res) => {
     res.sendFile(__dirname + '/index.html')
-  })
+})
 
 
 // MIDDLEWARE: USERNAME HANDSHAKE TO SOCKET
 io.use((socket, next) => {
+    //CHECK AVAILABLE SESSION
     const sessionID = socket.handshake.auth.sessionID
     if (sessionID) {
       const session = sessionStore.findSession(sessionID)
@@ -38,6 +39,13 @@ io.use((socket, next) => {
         return next()
       }
     }
+
+    //CHECK IF USERNAME ALREADY TAKEN
+    sessionStore.findAllSessions().forEach((session) => {
+        if(session.username === socket.handshake.auth.username) {
+            return next(new Error("username already taken"))
+        }
+    })
     const username = socket.handshake.auth.username
     if (!username) {
       return next(new Error("invalid username"))
@@ -51,9 +59,11 @@ io.use((socket, next) => {
 
 //CLIENT CONNECTION
 io.on('connection',(socket)=>{
+    socket.join(socket.userID)
+    const users = []
     console.log(socket)
 
-    
+
     //SAVE SESSION
     sessionStore.saveSession(socket.sessionID, {
         userID: socket.userID,
@@ -63,6 +73,7 @@ io.on('connection',(socket)=>{
     socket.emit("session", {
         sessionID: socket.sessionID,
         userID: socket.userID,
+        username: socket.username
     })
 
 
@@ -71,8 +82,7 @@ io.on('connection',(socket)=>{
         console.log(event, args)
     })
 
-    //USER JOIN
-    const users = []
+    //USER JOIN / update userlist
     sessionStore.findAllSessions().forEach((session) => {
         if(session.connected === true) {
             users.push({
@@ -89,10 +99,13 @@ io.on('connection',(socket)=>{
     socket.on('chat message', msg => {
         io.emit('chat message',`<b>${socket.username}</b>: ${msg}`)
     })
-
     //PRIVATE MESSAGE
-    socket.on('private_message', (toUser, msgToUser) => {
-    
+    socket.on('private_message', (toUser, msg) => {
+        socket.join(toUser)
+        io.to(toUser).to(socket.userID).emit('private_message', {
+            msg: msg,
+            from: socket.userID
+        })
     })
     
     //USER DISCONNECT
@@ -105,6 +118,7 @@ io.on('connection',(socket)=>{
             username: socket.username,
             connected: false,
         });
+        console.log(users)
         io.emit('user_quit', (users))
     })
 })

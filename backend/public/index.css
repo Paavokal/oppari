@@ -53,6 +53,37 @@ body {
     grid-template-columns: 6fr 1fr;
     grid-template-rows: 1fr;
 }
+#privateWindow {
+    display:none;
+    background-color: #596c75;
+    grid-column-start: 1;
+    grid-column-end: 1;
+    grid-row-start: 1;
+    grid-row-end: 1;
+    overflow: auto;
+    height: 100%;
+}
+#privateHeader {
+    text-align: center;
+    font-size: 20px;
+}
+#privateForm {
+    z-index: 1;
+    background: rgba(0, 0, 0, 0.15);
+    padding: 0.25rem;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: none;
+    height: 3rem;
+    box-sizing: border-box;
+    backdrop-filter: blur(10px);
+}
+#privateForm > button { background: #333; border: none; padding: 0 1rem; margin: 0.25rem; border-radius: 3px; outline: none; color: #fff; }
+#privateInput { border: none; padding: 0 1rem; flex-grow: 1; border-radius: 2rem; margin: 0.25rem; }
+#privateInput:focus { outline: none; }
+
 #messageWindow{
     background-color: #a2b9ac;
     grid-column-start: 1;
@@ -75,14 +106,13 @@ body {
     min-width: fit-content;
 }
 
-
-
 #loginWindow{
     display:flex;
     flex-direction: column;
     justify-content: flex-start;
     height: 100%;
     align-items: center;
+    width:100%;
 }
 
 #users {
