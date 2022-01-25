@@ -4,7 +4,14 @@ const http = require('http')
 const server = http.createServer(app)
 const PORT = process.env.PORT || 3001
 const socketIo = require('socket.io')
-const socketioJwt = require('socketio-jwt')
+const jwt = require('jsonwebtoken')
+const crypto = require('crypto')
+const randomId = () => crypto.randomBytes(8).toString("hex")
+require("dotenv").config()
+
+const { InMemorySessionStore } = require("./sessionStore");
+const sessionStore = new InMemorySessionStore();
+
 
 const io = socketIo(server,{ 
     cors: {
@@ -18,37 +25,65 @@ app.get('/', (req, res) => {
     res.sendFile(__dirname + '/index.html')
   })
 
-const date = `Server startup: ${new Date()}`
-const users = []
-
 
 // MIDDLEWARE: USERNAME HANDSHAKE TO SOCKET
 io.use((socket, next) => {
-    console.log(socket.handshake.auth.username)
+    const sessionID = socket.handshake.auth.sessionID
+    if (sessionID) {
+      const session = sessionStore.findSession(sessionID)
+      if (session) {
+        socket.sessionID = sessionID
+        socket.userID = session.userID
+        socket.username = session.username
+        return next()
+      }
+    }
     const username = socket.handshake.auth.username
     if (!username) {
-        return next(new Error("invalid username"))
+      return next(new Error("invalid username"))
     }
+    socket.sessionID = randomId()
+    socket.userID = randomId()
     socket.username = username
     next()
-})
+  })
 
 
 //CLIENT CONNECTION
 io.on('connection',(socket)=>{
-
     console.log(socket)
+
+    
+    //SAVE SESSION
+    sessionStore.saveSession(socket.sessionID, {
+        userID: socket.userID,
+        username: socket.username,
+        connected: true,
+    })
+    socket.emit("session", {
+        sessionID: socket.sessionID,
+        userID: socket.userID,
+    })
+
+
+    //LOGGING ALL EVENTS
     socket.onAny((event, ...args) => {
         console.log(event, args)
     })
 
     //USER JOIN
-    socket.on('user_join', () => {
-        users.push(socket.username)
-        io.emit('user_join', users)
-        socket.broadcast.emit('chat message', `<b> ${socket.username} connected </b>`)
-        console.log(users)
+    const users = []
+    sessionStore.findAllSessions().forEach((session) => {
+        if(session.connected === true) {
+            users.push({
+            userID: session.userID,
+            username: session.username,
+            connected: session.connected,
+            })
+        }
     })
+    console.log(users)
+    io.emit("users", users)
 
     //CHAT-MESSAGE
     socket.on('chat message', msg => {
@@ -57,17 +92,20 @@ io.on('connection',(socket)=>{
 
     //PRIVATE MESSAGE
     socket.on('private_message', (toUser, msgToUser) => {
-        console.log(io.allSockets())
+    
     })
     
     //USER DISCONNECT
     socket.on('disconnect', () => {
-        if (socket.username) {
-            users.splice(users.indexOf(socket.username), 1)
-            console.log(users)
-            io.emit('user_quit', users)
-            socket.broadcast.emit('chat message', `<b> ${socket.username} disconnected </b>`)
-          }
+        //remove user from users array
+        users.splice(users.findIndex(u => u.userID === socket.userID), 1)
+        //save sessionid with connected:false
+        sessionStore.saveSession(socket.sessionID, {
+            userID: socket.userID,
+            username: socket.username,
+            connected: false,
+        });
+        io.emit('user_quit', (users))
     })
 })
 
