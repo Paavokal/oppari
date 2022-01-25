@@ -47,6 +47,14 @@
       <script>
         
           const socket = io({autoConnect:false})
+          console.log(socket)
+
+          const sessionID = window.localStorage.getItem('sessionID')
+          if(sessionID) {
+            socket.auth = { sessionID }
+            socket.connect()
+          }
+
 
           const form = document.getElementById('form')
           const input = document.getElementById('input')
@@ -58,6 +66,19 @@
           const userList = document.getElementById('users')
 
           const nickname = ''
+
+          socket.on("session", ({ sessionID, userID }) => {
+            // attach the session ID to the next reconnection attempts
+            socket.auth = { sessionID }
+            // store it in the localStorage
+            window.localStorage.setItem('sessionID', sessionID)
+            // save the ID of the user
+            socket.userID = userID
+            chat.style.display = 'grid'
+            form.style.display = 'flex'
+            loginWindow.style.display = 'none'
+          })
+
           
 
           // SET NICKNAME EVENTHANDLER
@@ -67,12 +88,15 @@
                 if(nickInput.value){
                     socket.auth = { username:nickInput.value }
                     socket.connect()
-                    socket.emit('user_join', null)
                     chat.style.display = 'grid'
                     form.style.display = 'flex'
                     loginWindow.style.display = 'none'
                     document.title = `Chatti - ${nickInput.value}`
               }
+          })
+
+          socket.on('connected', (user, token) => {
+                socket.emit('user_join', null)
           })
 
           //CHAT-MESSAGE EVENTHANDLER
@@ -93,18 +117,28 @@
                 socket.emit('chat message', input.value)
                 input.value = ''
             }
-      })
-        
-          //USER JOIN
-          socket.on('user_join', (users) => {
-                userList.innerHTML= ''
-                users.forEach(element => {
-                    const item = document.createElement('li')
-                    item.innerHTML = element
-                    userList.appendChild(item)
-                });
-                console.log(socket)
+          })
 
+
+
+
+          const privateMessage = (element) => {
+               console.log(element.username + ' ' + element.userID )
+          }
+
+
+          //USER JOIN
+          socket.on('users', (users) => {
+                const usersConnected = users.map(u => u)
+                userList.innerHTML= ''
+                usersConnected.forEach(element => {
+                    const item = document.createElement('li')
+                    item.innerHTML = element.username
+                    item.addEventListener('click', () => {
+                        privateMessage(element)
+                    })
+                    userList.appendChild(item)
+                })
           })
 
           //CHAT MESSAGE
@@ -117,10 +151,11 @@
 
           //USER DISCONNECT
           socket.on('user_quit', (users) => {
+            const usersConnected = users.map(u => u)
             userList.innerHTML=''
-            users.forEach(element => {
+            usersConnected.forEach(element => {
                 var item = document.createElement('li')
-                item.innerHTML = element
+                item.innerHTML = element.username
                 userList.appendChild(item)         
             })
           })
@@ -129,6 +164,10 @@
             if (err.message === "invalid username") {
                 console.log('Invalid username')
             }
+            if (err.message === "invalid token") {
+                console.log('invalid token')
+            }
+
           })
 
 

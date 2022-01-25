@@ -21,9 +21,11 @@
   "author": "Paavo Kalliala",
   "license": "MIT",
   "dependencies": {
+    "crypto": "^1.0.1",
+    "dotenv": "^14.2.0",
     "express": "^4.17.2",
-    "socket.io": "^4.4.1",
-    "socketio-jwt": "^4.6.2"
+    "jsonwebtoken": "^8.5.1",
+    "socket.io": "^4.4.1"
   },
   "devDependencies": {
     "nodemon": "^2.0.15"
