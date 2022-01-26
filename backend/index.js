@@ -101,10 +101,11 @@ io.on('connection',(socket)=>{
     })
     //PRIVATE MESSAGE
     socket.on('private_message', (toUser, msg) => {
-        socket.join(toUser)
+        console.log(`priva viesti lähetetään ${toUser} ja ${socket.userID}`)
         io.to(toUser).to(socket.userID).emit('private_message', {
             msg: msg,
-            from: socket.userID
+            from: socket.userID,
+            to: toUser
         })
     })
     
@@ -119,7 +120,7 @@ io.on('connection',(socket)=>{
             connected: false,
         });
         console.log(users)
-        io.emit('user_quit', (users))
+        io.emit('users', (users))
     })
 })
 

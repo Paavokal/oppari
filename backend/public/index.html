@@ -81,6 +81,7 @@
           const privateExit = document.getElementById('privateExit')
           const nickname = ''
           var toUser = ''
+          privaUser = []
 
 
           //SESSION ON
@@ -129,12 +130,13 @@
             }
           })
 
-          
+          //SEND PRIVATE MESSAGE 
           privateForm.addEventListener('submit', (e) =>{
             e.preventDefault()
             const msg = privateInput.value
             socket.emit('private_message', toUser, msg)
             privateInput.value = ''
+
           })
 
           //CLOSE PRIVATE WINDOW
@@ -155,7 +157,26 @@
             privateForm.style.display = 'flex'
             form.style.display = 'none'
             toUser = element.userID
-            console.log(element.username + ' ' + element.userID )     
+            console.log('priva ikkuna auki')
+            console.log(toUser)
+            console.log(privaUser)
+
+            privateMessages.innerHTML=''
+            privaUser.forEach(pu => {
+                if(element.userID === socket.userID){
+                    if (pu.to === element.userID && pu.from === element.userID) {
+                        var item = document.createElement('li')
+                        item.innerHTML = pu.msg
+                        privateMessages.appendChild(item)
+                }    
+
+                }
+                else if (pu.to === element.userID || pu.from === element.userID) {
+                var item = document.createElement('li')
+                item.innerHTML = pu.msg
+                privateMessages.appendChild(item)
+                }         
+            })    
           }
 
           //USER JOIN
@@ -183,21 +204,13 @@
           //PRIVATE MESSAGE
           socket.on('private_message', (data) => {
             console.log(data.from +' private message tulee: ' + data.msg)
-            
-            for (let i = 0; i < this.users.length; i++) {
-                const user = this.users[i];
-                if (user.userID === data.from) {
-                    user.messages.push(data.msg)
-                    console.log(user.messages)
-                }
-                break;
-            }
-        
-            console.log('private message tulee')
             var item = document.createElement('li')
             item.innerHTML = data.msg
             privateMessages.appendChild(item)
-            privateWindow.scrollTo(0, privateWindow.scrollHeight)
+                       
+            privaUser.push(data)
+            
+
           })
 
           //USER DISCONNECT

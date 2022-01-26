@@ -83,6 +83,20 @@ body {
 #privateForm > button { background: #333; border: none; padding: 0 1rem; margin: 0.25rem; border-radius: 3px; outline: none; color: #fff; }
 #privateInput { border: none; padding: 0 1rem; flex-grow: 1; border-radius: 2rem; margin: 0.25rem; }
 #privateInput:focus { outline: none; }
+#privateMessages {
+    list-style-type: none;
+    margin:0;
+    padding:20px;
+}
+
+#privateMessages > li { 
+    border: groove;
+    padding: 15px;
+    border-radius: 14px;
+    width: fit-content;
+    margin-bottom: 12px;
+}
+
 
 #messageWindow{
     background-color: #a2b9ac;
@@ -105,6 +119,12 @@ body {
     border-color: cadetblue;
     min-width: fit-content;
 }
+#userWindow > ul > li {
+    text-align:center;
+    cursor:pointer;
+    border-style: outset;
+    margin-bottom: 5px;
+}
 
 #loginWindow{
     display:flex;
@@ -112,8 +132,22 @@ body {
     justify-content: flex-start;
     height: 100%;
     align-items: center;
-    width:100%;
 }
+
+#setNickname{
+    display:flex;
+    flex-direction: column;
+    width:100px;
+    align-items: center;
+
+}
+#setNickname > input {
+    width:100px;
+}
+#setNickname > button {
+    width:50px;
+}
+
 
 #users {
     list-style-type: none;
