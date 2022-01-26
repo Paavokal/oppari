@@ -1,5 +1,6 @@
 html {
     box-sizing: border-box;
+    height: -webkit-fill-available;
   }
   
   *,
@@ -15,6 +16,10 @@ body {
   max-height: 100vh;
   margin: 0;
   font-family:monospace;
+}
+body{
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
 }
 
 #app{
