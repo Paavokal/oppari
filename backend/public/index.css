@@ -199,3 +199,14 @@ body {
     font-family: monospace;
     letter-spacing: 10px;
 }
+
+@keyframes blink { 
+    50% { border-color: #d97916 } 
+ }
+ #blink{ /*or other element you want*/
+     animation-name: blink ;
+     animation-duration: .3s ;
+     animation-timing-function: step-end ;
+     animation-iteration-count: infinite ;
+     animation-direction: alternate ;
+ }

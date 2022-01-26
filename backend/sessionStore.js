@@ -1,4 +1,4 @@
-/* abstract */ class SessionStore {
+class SessionStore {
     findSession(id) {}
     saveSession(id, session) {}
     findAllSessions() {}

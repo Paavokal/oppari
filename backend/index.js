@@ -103,11 +103,10 @@ io.on('connection',(socket)=>{
     socket.on('private_message', (toUser, msg) => {
         console.log(`priva viesti lähetetään ${toUser} ja ${socket.userID}`)
         io.to(toUser).to(socket.userID).emit('private_message', {
-            msg: msg,
+            msg: socket.username + ': ' + msg,
             from: socket.userID,
             to: toUser
         })
-        io.to(toUser).emit('users', users)
     })
 
     socket.on('new message', () => {
@@ -117,15 +116,17 @@ io.on('connection',(socket)=>{
     //USER DISCONNECT
     socket.on('disconnect', () => {
         //remove user from users array
-        users.splice(users.findIndex(u => u.userID === socket.userID), 1)
+
+        // users.splice(users.findIndex(u => u.userID === socket.userID), 1)
         //save sessionid with connected:false
         sessionStore.saveSession(socket.sessionID, {
             userID: socket.userID,
             username: socket.username,
             connected: false,
         });
-        console.log(users)
-        io.emit('users', (users))
+        console.log('poistetaan' + socket.userID)
+        io.emit('user_disconnect', socket.userID)
+        // io.emit('users', (users))
     })
 })
 

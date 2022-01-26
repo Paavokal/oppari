@@ -83,6 +83,7 @@
           var toUser = ''
           privaUser = []
           newMessage = []
+          curUser = []
 
 
           userUpdate = (users) => {
@@ -90,18 +91,13 @@
             const usersConnected = users.map(u => u)
                 userList.innerHTML= ''
                 usersConnected.forEach(element => {
-                    const item = document.createElement('li')
-                    if ( newMessage.includes(element.userID) ){
-                        item.innerHTML = element.username
-                        item.style.fontWeight = 'bold'
-                        item.style.background = '#82c2bf'
+                    const item = document.createElement('li')           
+                    item.innerHTML = element.username
+                    // item.style.fontWeight = 'normal'
+                    if(newMessage.includes(element.userID)){
+                        // item.style.background = 'white'
+                        item.id = 'blink'
                     }
-                    else {
-                        item.innerHTML = element.username
-                        item.style.fontWeight = 'normal'
-                        item.style.background = 'none'
-                    }
-
                     item.addEventListener('click', () => {
                         privateMessage(element)
                     })
@@ -191,13 +187,13 @@
 
             privateMessages.innerHTML=''
             privaUser.forEach(pu => {
+                //private to self
                 if(element.userID === socket.userID){
                     if (pu.to === element.userID && pu.from === element.userID) {
                         var item = document.createElement('li')
                         item.innerHTML = pu.msg
                         privateMessages.appendChild(item)
-                }    
-
+                    }    
                 }
                 else if (pu.to === element.userID || pu.from === element.userID) {
                 var item = document.createElement('li')
@@ -206,13 +202,17 @@
                 }         
             })
             newMessage = newMessage.filter(u => u !== element.userID)
-            socket.emit('new message', null)
+            userUpdate(curUsers)
+
+            // socket.emit('new message', null)
           }
 
           //USERS UPDATE
           socket.on('users', (users) => {
               console.log('päivitetään käyttäjät')
-              userUpdate(users)
+              console.log(users)
+              curUsers=users
+              userUpdate(curUsers)
                 
           })
 
@@ -232,21 +232,17 @@
             privateMessages.appendChild(item)                     
             privaUser.push(data)
             if(data.from !== socket.userID){
-                newMessage.push(data.from) 
+                newMessage.push(data.from)
             }
-     
+                userUpdate(curUsers)
           })
 
-          //USER DISCONNECT
-          socket.on('user_quit', (users) => {
-            const usersConnected = users.map(u => u)
-            userList.innerHTML=''
-            usersConnected.forEach(element => {
-                var item = document.createElement('li')
-                item.innerHTML = element.username
-                userList.appendChild(item)         
-            })
+          socket.on('user_disconnect', (userID) => {
+                console.log('poistetaan ' + userID)
+                curUsers.splice(curUsers.findIndex(u => u.userID === userID), 1)
+                userUpdate(curUsers)
           })
+
 
           //CONNECT ERRORS
           socket.on("connect_error", (err) => {
