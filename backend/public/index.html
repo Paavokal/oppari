@@ -82,6 +82,35 @@
           const nickname = ''
           var toUser = ''
           privaUser = []
+          newMessage = []
+
+
+          userUpdate = (users) => {
+            console.log(newMessage)
+            const usersConnected = users.map(u => u)
+                userList.innerHTML= ''
+                usersConnected.forEach(element => {
+                    const item = document.createElement('li')
+                    if ( newMessage.includes(element.userID) ){
+                        item.innerHTML = element.username
+                        item.style.fontWeight = 'bold'
+                        item.style.background = '#82c2bf'
+                    }
+                    else {
+                        item.innerHTML = element.username
+                        item.style.fontWeight = 'normal'
+                        item.style.background = 'none'
+                    }
+
+                    item.addEventListener('click', () => {
+                        privateMessage(element)
+                    })
+                    userList.appendChild(item)
+                })
+              
+
+          }
+          
 
 
           //SESSION ON
@@ -136,7 +165,6 @@
             const msg = privateInput.value
             socket.emit('private_message', toUser, msg)
             privateInput.value = ''
-
           })
 
           //CLOSE PRIVATE WINDOW
@@ -146,7 +174,7 @@
             messageWindow.style.display = 'block'
             privateForm.style.display = 'none'
             form.style.display = 'flex'
-
+            toUser = ''
           })
 
         //OPEN PRIVATE WINDOW
@@ -176,21 +204,16 @@
                 item.innerHTML = pu.msg
                 privateMessages.appendChild(item)
                 }         
-            })    
+            })
+            newMessage = newMessage.filter(u => u !== element.userID)
+            socket.emit('new message', null)
           }
 
-          //USER JOIN
+          //USERS UPDATE
           socket.on('users', (users) => {
-                const usersConnected = users.map(u => u)
-                userList.innerHTML= ''
-                usersConnected.forEach(element => {
-                    const item = document.createElement('li')
-                    item.innerHTML = element.username
-                    item.addEventListener('click', () => {
-                        privateMessage(element)
-                    })
-                    userList.appendChild(item)
-                })
+              console.log('päivitetään käyttäjät')
+              userUpdate(users)
+                
           })
 
           //CHAT MESSAGE
@@ -206,11 +229,12 @@
             console.log(data.from +' private message tulee: ' + data.msg)
             var item = document.createElement('li')
             item.innerHTML = data.msg
-            privateMessages.appendChild(item)
-                       
+            privateMessages.appendChild(item)                     
             privaUser.push(data)
-            
-
+            if(data.from !== socket.userID){
+                newMessage.push(data.from) 
+            }
+     
           })
 
           //USER DISCONNECT

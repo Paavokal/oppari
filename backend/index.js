@@ -107,6 +107,11 @@ io.on('connection',(socket)=>{
             from: socket.userID,
             to: toUser
         })
+        io.to(toUser).emit('users', users)
+    })
+
+    socket.on('new message', () => {
+        io.to(socket.userID).emit('users', users)
     })
     
     //USER DISCONNECT
