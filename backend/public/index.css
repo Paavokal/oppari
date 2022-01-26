@@ -14,12 +14,13 @@ body {
   height: 100vh;
   max-height: 100vh;
   margin: 0;
+  font-family:monospace;
 }
 
 #app{
     display: grid;
     grid-template-columns: 1fr;
-    grid-template-rows: 50px auto 50px;
+    grid-template-rows: 50px auto 3rem;
     overflow: hidden;
     min-height: 100vh;
     /* Changes in media query to double this */
@@ -33,7 +34,7 @@ body {
 }
 
 #header {
-    background: linear-gradient(334deg, #939795, #a2b9ac);
+    background: linear-gradient(334deg, #2B616D, #becfc5);
     grid-column: 1 / span 1;
     grid-row: 1 / 1;
     display:flex;
@@ -41,9 +42,10 @@ body {
     align-items: center;
 }
 #footer {
-    background-color: #79978b;
     grid-column: 1 / span 1;
     grid-row: 3 / 3;
+    background: linear-gradient(161deg, black, transparent);
+    background-size: 200%;
 }
 #chat{
     height: 100%;
@@ -66,6 +68,14 @@ body {
 #privateHeader {
     text-align: center;
     font-size: 20px;
+}
+#privateTitle{
+    display:inline-block;
+    margin:5px;
+}
+#privateExit{
+    float:right;
+    margin:5px;
 }
 #privateForm {
     z-index: 1;
@@ -99,7 +109,7 @@ body {
 
 
 #messageWindow{
-    background-color: #a2b9ac;
+    background: linear-gradient( 271deg, #2B616D, #becfc5);
     grid-column-start: 1;
     grid-column-end: 1;
     grid-row-start: 1;
@@ -109,14 +119,14 @@ body {
 }
 
 #userWindow{
-    background-color: #939795;
+    background: linear-gradient( 128deg, #2B616D, #becfc5);
     grid-column-start: 2;
     grid-column-end: 2;
     grid-row-start: 1;
     grid-row-end: 1;
     overflow: auto;
     border: inset;
-    border-color: cadetblue;
+    border-color: #cf8c46;
     min-width: fit-content;
 }
 #userWindow > ul > li {
@@ -124,6 +134,7 @@ body {
     cursor:pointer;
     border-style: outset;
     margin-bottom: 5px;
+    padding: 4px;
 }
 
 #loginWindow{
@@ -132,6 +143,8 @@ body {
     justify-content: flex-start;
     height: 100%;
     align-items: center;
+    background: linear-gradient(106deg, #2B616D, #9eafa5);
+    background-size: 105%;
 }
 
 #setNickname{
@@ -170,10 +183,10 @@ body {
 }
 
 
-#form { z-index: 1; background: rgba(0, 0, 0, 0.15); padding: 0.25rem; position: fixed; bottom: 0; left: 0; right: 0; display: flex; height: 3rem; box-sizing: border-box; backdrop-filter: blur(10px); }
+#form { z-index: 1; padding: 0.25rem; position: fixed; bottom: 0; left: 0; right: 0; display: flex; height: 3rem; box-sizing: border-box; backdrop-filter: blur(10px); }
 #input { border: none; padding: 0 1rem; flex-grow: 1; border-radius: 2rem; margin: 0.25rem; }
 #input:focus { outline: none; }
-#form > button { background: #333; border: none; padding: 0 1rem; margin: 0.25rem; border-radius: 3px; outline: none; color: #fff; }
+#form > button { background: #cf8c46; border: none; padding: 0 1rem; margin: 0.25rem; border-radius: 3px; outline: none; color: #fff; }
 
 #form,
 #chat {
