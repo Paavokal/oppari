@@ -199,6 +199,7 @@
                 var item = document.createElement('li')
                 item.innerHTML = pu.msg
                 privateMessages.appendChild(item)
+                privateWindow.scrollTo(0, privateWindow.scrollHeight)
                 }         
             })
             newMessage = newMessage.filter(u => u !== element.userID)
@@ -229,7 +230,8 @@
             console.log(data.from +' private message tulee: ' + data.msg)
             var item = document.createElement('li')
             item.innerHTML = data.msg
-            privateMessages.appendChild(item)                     
+            privateMessages.appendChild(item) 
+            privateWindow.scrollTo(0, privateWindow.scrollHeight)                    
             privaUser.push(data)
             if(data.from !== socket.userID){
                 newMessage.push(data.from)
