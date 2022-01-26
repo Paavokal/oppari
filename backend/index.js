@@ -103,7 +103,7 @@ io.on('connection',(socket)=>{
     socket.on('private_message', (toUser, msg) => {
         console.log(`priva viesti lähetetään ${toUser} ja ${socket.userID}`)
         io.to(toUser).to(socket.userID).emit('private_message', {
-            msg: socket.username + ': ' + msg,
+            msg: `<b>${socket.username}:</b> ${msg}`,
             from: socket.userID,
             to: toUser
         })
