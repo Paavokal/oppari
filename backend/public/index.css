@@ -11,19 +11,27 @@ html {
 #app,
 html,
 body {
-  height: 100vh;
+ /*height: 100vh;
   max-height: 100vh;
   margin: 0;
-  font-family:monospace;
+  font-family:monospace;*/
+  margin: 0;
+  padding: 0;
+}
+html {
+    overflow: hidden;
+    width: 100%;
 }
 body{
-    min-height: 100vh;
-    min-height: -webkit-fill-available;
+    /*min-height: 100vh;
+    min-height: -webkit-fill-available;*/
+    height: 100%;
+    position: fixed;
+    overflow-y: scroll;
+    -webkit-overflow-scrolling: touch;
 }
 
-html {
-    height: -webkit-fill-available;
-}
+
 
 
 #app{
