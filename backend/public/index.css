@@ -29,6 +29,7 @@ body {
     /*
     min-height: 100vh;
     max-height: 100vh; */
+    font-family:monospace;
 }
 
 #chat-main{
@@ -140,7 +141,7 @@ body {
     margin-bottom: 5px;
     padding: 4px;
 }
-
+/* LOGIN */
 #loginWindow{
     display:flex;
     flex-direction: column;
@@ -149,6 +150,12 @@ body {
     align-items: center;
     background: linear-gradient(106deg, #2B616D, #9eafa5);
     background-size: 105%;
+}
+#loginWindow > p {
+    font-size: 20px;;
+}
+#nickError {
+    display:none;
 }
 
 #setNickname{

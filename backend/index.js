@@ -4,7 +4,6 @@ const http = require('http')
 const server = http.createServer(app)
 const PORT = process.env.PORT || 3001
 const socketIo = require('socket.io')
-const jwt = require('jsonwebtoken')
 const crypto = require('crypto')
 const randomId = () => crypto.randomBytes(8).toString("hex")
 require("dotenv").config()
@@ -12,21 +11,16 @@ require("dotenv").config()
 const { InMemorySessionStore } = require("./sessionStore");
 const sessionStore = new InMemorySessionStore();
 
-
-const io = socketIo(server,{ 
-    cors: {
-      origin: 'http://localhost:3000'
-    }
-})
+const io = socketIo(server)
 
 app.use(express.static(__dirname + '/public'))
 
-app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/index.html')
-})
+// app.get('/', (req, res) => {
+//     res.sendFile(__dirname + '/index.html')
+// })
 
 
-// MIDDLEWARE: USERNAME HANDSHAKE TO SOCKET
+// MIDDLEWARE: USERNAME SOCKET HANDSHAKE
 io.use((socket, next) => {
     //CHECK AVAILABLE SESSION
     const sessionID = socket.handshake.auth.sessionID
@@ -61,7 +55,6 @@ io.use((socket, next) => {
 io.on('connection',(socket)=>{
     socket.join(socket.userID)
     const users = []
-    console.log(socket)
 
 
     //SAVE SESSION
@@ -101,7 +94,7 @@ io.on('connection',(socket)=>{
     })
     //PRIVATE MESSAGE
     socket.on('private_message', (toUser, msg) => {
-        console.log(`priva viesti lähetetään ${toUser} ja ${socket.userID}`)
+        console.log(`private message: "${msg}" from:${socket.userID} to:${toUser}`)
         io.to(toUser).to(socket.userID).emit('private_message', {
             msg: `<b>${socket.username}:</b> ${msg}`,
             from: socket.userID,
@@ -115,18 +108,14 @@ io.on('connection',(socket)=>{
     
     //USER DISCONNECT
     socket.on('disconnect', () => {
-        //remove user from users array
-
-        // users.splice(users.findIndex(u => u.userID === socket.userID), 1)
-        //save sessionid with connected:false
+        //DISCONNECTED USER connected:false
         sessionStore.saveSession(socket.sessionID, {
             userID: socket.userID,
             username: socket.username,
             connected: false,
         });
-        console.log('poistetaan' + socket.userID)
+        console.log('User: ' + socket.userID + ' has left')
         io.emit('user_disconnect', socket.userID)
-        // io.emit('users', (users))
     })
 })
 
